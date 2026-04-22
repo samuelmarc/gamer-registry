@@ -31,3 +31,37 @@ describe('Parte 1 — Testes Básicos', () => {
         expect(Array.isArray(response.body)).toBe(true);
     });
 });
+
+describe('Parte 2 — Testes de Funcionalidade', () => {
+    test('Ex3 — POST /api/games deve criar um jogo com dados válidos', async () => {
+        mockQuery.mockResolvedValueOnce({ rows: [FAKE_GAME] });
+ 
+        const response = await request(app)
+            .post('/api/games')
+            .send({ title: 'Counter-Strike 2', genre: 'FPS', release_year: 2023 });
+ 
+        expect(response.statusCode).toBe(201);
+    });
+ 
+    test('Ex4 — POST /api/games com corpo vazio deve retornar 400', async () => {
+        const response = await request(app)
+            .post('/api/games')
+            .send({});
+ 
+        expect(response.statusCode).toBe(400);
+    });
+ 
+    test('Ex5 — deve criar um jogo e buscá-lo por ID com status 200', async () => {
+        mockQuery.mockResolvedValueOnce({ rows: [FAKE_GAME] });
+        mockQuery.mockResolvedValueOnce({ rows: [FAKE_GAME] });
+ 
+        const created = await request(app)
+            .post('/api/games')
+            .send({ title: 'Counter-Strike 2', genre: 'FPS', release_year: 2023 });
+ 
+        const id = created.body.id;
+ 
+        const response = await request(app).get(`/api/games/${id}`);
+        expect(response.statusCode).toBe(200);
+    });
+});
