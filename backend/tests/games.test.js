@@ -65,3 +65,29 @@ describe('Parte 2 — Testes de Funcionalidade', () => {
         expect(response.statusCode).toBe(200);
     });
 });
+
+describe('Parte 4 — Desafio: Fluxo Completo', () => {
+    test('Ex6 — deve criar, buscar, deletar e retornar 404 após deleção', async () => {
+        mockQuery.mockResolvedValueOnce({ rows: [FAKE_GAME] });
+        mockQuery.mockResolvedValueOnce({ rows: [FAKE_GAME] });
+        mockQuery.mockResolvedValueOnce({ rows: [] });
+        mockQuery.mockResolvedValueOnce({ rows: [] });
+ 
+        const created = await request(app)
+            .post('/api/games')
+            .send({ title: 'The Last of Us', genre: 'Action', release_year: 2013 });
+ 
+        expect(created.statusCode).toBe(201);
+ 
+        const id = created.body.id;
+ 
+        const fetched = await request(app).get(`/api/games/${id}`);
+        expect(fetched.statusCode).toBe(200);
+ 
+        const deleted = await request(app).delete(`/api/games/${id}`);
+        expect(deleted.statusCode).toBe(204);
+ 
+        const afterDelete = await request(app).get(`/api/games/${id}`);
+        expect(afterDelete.statusCode).toBe(404);
+    });
+});
